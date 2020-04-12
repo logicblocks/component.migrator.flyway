@@ -18,7 +18,7 @@ RakeSSH.define_key_tasks(
 
 RakeCircleCI.define_project_tasks(
     namespace: :circle_ci,
-    project_slug: 'github/logicblocks/component.jdbc-data-source.postgres'
+    project_slug: 'github/logicblocks/component.flyway-migrator'
 ) do |t|
   circle_ci_config =
       YAML.load_file('config/secrets/circle_ci/config.yaml')
@@ -39,7 +39,7 @@ end
 
 RakeGithub.define_repository_tasks(
     namespace: :github,
-    repository: 'logicblocks/component.jdbc-data-source.postgres',
+    repository: 'logicblocks/component.flyway-migrator',
 ) do |t|
   github_config =
       YAML.load_file('config/secrets/github/config.yaml')
@@ -89,7 +89,7 @@ end
 namespace :database do
   namespace :test do
     RakeDocker.define_container_tasks(
-        container_name: 'flyway-migrations-test-database') do |t|
+        container_name: 'flyway-migrator-test-database') do |t|
       t.image = "postgres:11.5"
       t.ports = ['5432:5432']
       t.environment = [

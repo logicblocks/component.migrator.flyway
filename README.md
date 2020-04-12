@@ -1,8 +1,8 @@
-# component.flyway-migrations
+# component.flyway-migrator
 
-[![Clojars Project](https://img.shields.io/clojars/v/io.logicblocks/component.flyway-migrations.svg)](https://clojars.org/io.logicblocks/component.flyway-migrations)
-[![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/component.flyway-migrations.svg)](https://clojars.org/io.logicblocks/component.flyway-migrations)
-[![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/component.flyway-migrations.svg)](https://github.com/logicblocks/component.flyway-migrations/graphs/contributors)
+[![Clojars Project](https://img.shields.io/clojars/v/io.logicblocks/component.flyway-migrator.svg)](https://clojars.org/io.logicblocks/component.flyway-migrator)
+[![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/component.flyway-migrator.svg)](https://clojars.org/io.logicblocks/component.flyway-migrator)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/component.flyway-migrator.svg)](https://github.com/logicblocks/component.flyway-migrator/graphs/contributors)
 
 A component providing a pooled postgres JDBC data source.
 
@@ -11,12 +11,12 @@ A component providing a pooled postgres JDBC data source.
 Add the following to your `project.clj` file:
 
 ```clj
-[io.logicblocks/component.flyway-migrations "0.1.0"]
+[io.logicblocks/component.flyway-migrator "0.1.0"]
 ```
 
 ## Documentation
 
-* [API Docs](https://logicblocks.github.io/component.flyway-migrations/index.html)
+* [API Docs](https://logicblocks.github.io/component.flyway-migrator/index.html)
 
 ## Usage
 

@@ -1,11 +1,12 @@
-(defproject io.logicblocks/component.flyway-migrations "0.1.0-RC0"
+(defproject io.logicblocks/component.flyway-migrator "0.1.0-RC0"
   :description "A component to run flyway migrations on system start."
-  :url "https://github.com/logicblocks/component.flyway-migrations"
+  :url "https://github.com/logicblocks/component.flyway-migrator"
 
   :license {:name "The MIT License"
             :url  "https://opensource.org/licenses/MIT"}
 
-  :dependencies [[org.flywaydb/flyway-core "6.1.0"]]
+  :dependencies [[org.flywaydb/flyway-core "6.3.3"]
+                 [com.stuartsierra/component "1.0.0"]]
 
   :plugins [[lein-cloverage "1.1.2"]
             [lein-shell "0.5.0"]
@@ -21,6 +22,7 @@
   :profiles
   {:shared
    {:dependencies [[org.clojure/clojure "1.10.1"]
+                   [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.4"]
                    [nrepl "0.7.0"]
                    [eftest "0.5.9"]]}
    :dev
@@ -59,11 +61,11 @@
   {:ns-exclude-regex [#"^user"]}
 
   :codox
-  {:namespaces  [#"^component\.flyway-migrations\."]
+  {:namespaces  [#"^component\.flyway-migrator\."]
    :metadata    {:doc/format :markdown}
    :output-path "docs"
    :doc-paths   ["docs"]
-   :source-uri  "https://github.com/logicblocks/component.flyway-migrations/blob/{version}/{filepath}#L{line}"}
+   :source-uri  "https://github.com/logicblocks/component.flyway-migrator/blob/{version}/{filepath}#L{line}"}
 
   :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
 
