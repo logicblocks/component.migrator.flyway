@@ -89,7 +89,7 @@ end
 namespace :database do
   namespace :test do
     RakeDocker.define_container_tasks(
-        container_name: 'test-database') do |t|
+        container_name: 'flyway-migrations-test-database') do |t|
       t.image = "postgres:11.5"
       t.ports = ['5432:5432']
       t.environment = [
