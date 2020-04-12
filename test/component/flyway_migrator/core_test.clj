@@ -28,6 +28,15 @@
   (jdbc/execute! db-spec (str "DROP SCHEMA " schema " CASCADE"))
   (jdbc/execute! db-spec (str "CREATE SCHEMA " schema)))
 
+(defn list-tables-in-schema [db-spec schema]
+  (jdbc/query db-spec
+    (str
+      "SELECT * "
+      "FROM pg_catalog.pg_tables "
+      "WHERE schemaname = "
+      "'" schema "';")
+    {:as-array true}))
+
 (defn with-started-component [component f]
   (let [container (atom component)]
     (try
@@ -39,18 +48,28 @@
 
 (deftest runs-migrations-by-default-on-start
   (let [data-source (data-source)
-        db-spec {:datasource data-source}]
-    (clear-schema db-spec "public")
+        configuration {}
+        db-spec {:datasource data-source}
+        schema "public"]
+    (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source})
+      (flyway-migrator/create {:data-source data-source
+                               :configuration configuration})
       (fn [_]
-        (let [tables
-              (jdbc/query db-spec
-                (str
-                  "SELECT * "
-                  "FROM pg_catalog.pg_tables "
-                  "WHERE schemaname = 'public';")
-                {:as-array true})]
+        (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"users" "flyway_schema_history"})))))))
+
+(deftest does-not-run-migrations-when-requested
+  (let [data-source (data-source)
+        configuration {:migrate-on-start false}
+        db-spec {:datasource data-source}
+        schema "public"]
+    (clear-schema db-spec schema)
+    (with-started-component
+      (flyway-migrator/create {:data-source data-source
+                               :configuration configuration})
+      (fn [_]
+        (let [tables (list-tables-in-schema db-spec schema)]
+          (is (= (count tables) 0)))))))
