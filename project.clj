@@ -22,9 +22,11 @@
   :profiles
   {:shared
    {:dependencies [[org.clojure/clojure "1.10.1"]
+                   [org.clojure/java.jdbc "0.7.11"]
                    [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.4"]
                    [nrepl "0.7.0"]
-                   [eftest "0.5.9"]]}
+                   [eftest "0.5.9"]]
+    :resource-paths ["test_resources"]}
    :dev
    [:shared {:source-paths ["dev"]
              :eftest       {:multithread? false}}]

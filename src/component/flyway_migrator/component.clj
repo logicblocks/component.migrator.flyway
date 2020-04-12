@@ -1,12 +1,16 @@
 (ns component.flyway-migrator.component
   (:require
-   [com.stuartsierra.component :as component]))
+   [com.stuartsierra.component :as component]
+
+   [component.flyway-migrator.flyway :as flyway]))
 
 (defrecord FlywayMigrator
            [data-source configuration]
   component/Lifecycle
 
   (start [component]
-    component)
+    (let [client (flyway/client {:data-source data-source})]
+      (flyway/migrate client)
+      (assoc component :client client)))
   (stop [component]
-    component))
+    (assoc component :client nil)))
