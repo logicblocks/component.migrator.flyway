@@ -73,3 +73,49 @@
       (fn [_]
         (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 0)))))))
+
+(deftest allows-migrations-to-be-run-on-demand
+  (let [data-source (data-source)
+        configuration {:migrate-on-start false}
+        db-spec {:datasource data-source}
+        schema "public"]
+    (clear-schema db-spec schema)
+    (with-started-component
+      (flyway-migrator/create {:data-source data-source
+                               :configuration configuration})
+      (fn [component]
+        (flyway-migrator/migrate component)
+        (let [tables (list-tables-in-schema db-spec schema)]
+          (is (= (count tables) 2))
+          (is (= (set (map :tablename tables))
+                #{"users" "flyway_schema_history"})))))))
+
+(deftest uses-the-provided-migration-locations
+  (let [data-source (data-source)
+        configuration {:locations ["classpath:database/migrations"]}
+        db-spec {:datasource data-source}
+        schema "public"]
+    (clear-schema db-spec schema)
+    (with-started-component
+      (flyway-migrator/create {:data-source data-source
+                               :configuration configuration})
+      (fn [_]
+        (let [tables (list-tables-in-schema db-spec schema)]
+          (is (= (count tables) 2))
+          (is (= (set (map :tablename tables))
+                #{"events" "flyway_schema_history"})))))))
+
+(deftest uses-the-provided-migration-table
+  (let [data-source (data-source)
+        configuration {:table "migration_history"}
+        db-spec {:datasource data-source}
+        schema "public"]
+    (clear-schema db-spec schema)
+    (with-started-component
+      (flyway-migrator/create {:data-source data-source
+                               :configuration configuration})
+      (fn [_]
+        (let [tables (list-tables-in-schema db-spec schema)]
+          (is (= (count tables) 2))
+          (is (= (set (map :tablename tables))
+                #{"users" "migration_history"})))))))
