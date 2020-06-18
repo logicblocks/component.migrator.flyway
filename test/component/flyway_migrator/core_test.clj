@@ -53,8 +53,8 @@
         schema "public"]
     (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source
-                               :configuration configuration})
+      (flyway-migrator/component {:data-source data-source
+                                  :configuration  configuration})
       (fn [_]
         (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 2))
@@ -68,8 +68,8 @@
         schema "public"]
     (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source
-                               :configuration configuration})
+      (flyway-migrator/component {:data-source data-source
+                                  :configuration  configuration})
       (fn [_]
         (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 0)))))))
@@ -81,8 +81,8 @@
         schema "public"]
     (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source
-                               :configuration configuration})
+      (flyway-migrator/component {:data-source data-source
+                                  :configuration  configuration})
       (fn [component]
         (flyway-migrator/migrate component)
         (let [tables (list-tables-in-schema db-spec schema)]
@@ -97,8 +97,8 @@
         schema "public"]
     (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source
-                               :configuration configuration})
+      (flyway-migrator/component {:data-source data-source
+                                  :configuration  configuration})
       (fn [_]
         (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 2))
@@ -112,8 +112,8 @@
         schema "public"]
     (clear-schema db-spec schema)
     (with-started-component
-      (flyway-migrator/create {:data-source data-source
-                               :configuration configuration})
+      (flyway-migrator/component {:data-source data-source
+                                  :configuration  configuration})
       (fn [_]
         (let [tables (list-tables-in-schema db-spec schema)]
           (is (= (count tables) 2))

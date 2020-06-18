@@ -1,6 +1,6 @@
 (ns component.flyway-migrator.flyway
   (:import
-    [org.flywaydb.core Flyway]))
+   [org.flywaydb.core Flyway]))
 
 (defn client [{:keys [data-source locations table]}]
   (let [configuration (Flyway/configure)
