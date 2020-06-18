@@ -11,7 +11,7 @@ A component to execute flyway migrations on start up.
 Add the following to your `project.clj` file:
 
 ```clj
-[io.logicblocks/component.flyway-migrator "0.1.0"]
+[io.logicblocks/component.flyway-migrator "0.1.1"]
 ```
 
 ## Documentation
