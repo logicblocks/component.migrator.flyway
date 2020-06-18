@@ -4,7 +4,7 @@
 [![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/component.flyway-migrator.svg)](https://clojars.org/io.logicblocks/component.flyway-migrator)
 [![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/component.flyway-migrator.svg)](https://github.com/logicblocks/component.flyway-migrator/graphs/contributors)
 
-A component providing a pooled postgres JDBC data source.
+A component to execute flyway migrations on start up.
 
 ## Install
 
