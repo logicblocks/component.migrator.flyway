@@ -4,8 +4,23 @@ orbs:
   slack: circleci/slack@4.8.3
 
 ruby_container: &ruby_container
+  - image: ruby:3.1.1
+
+postgres_container: &postgres_container
+  - image: circleci/postgres:11.5-alpine
+    environment:
+      POSTGRES_DB: some-database
+      POSTGRES_PASSWORD: super-secret
+      POSTGRES_USER: admin
+
+build_containers: &build_containers
   docker:
-    - image: ruby:3.1.1
+    <<: *ruby_container
+
+test_containers: &test_containers
+  docker:
+    <<: *ruby_container
+    <<: *postgres_container
 
 slack_context: &slack_context
   context:
@@ -76,7 +91,7 @@ commands:
 
 jobs:
   build:
-    <<: *ruby_container
+    <<: *build_containers
     steps:
       - checkout
       - configure_build_tools
@@ -84,7 +99,7 @@ jobs:
       - notify
 
   test:
-    <<: *ruby_container
+    <<: *test_containers
     working_directory: ~/source
     steps:
       - checkout
@@ -93,7 +108,7 @@ jobs:
       - notify
 
   prerelease:
-    <<: *ruby_container
+    <<: *build_containers
     steps:
       - checkout
       - configure_build_tools
@@ -103,7 +118,7 @@ jobs:
       - notify
 
   release:
-    <<: *ruby_container
+    <<: *build_containers
     steps:
       - checkout
       - configure_build_tools
@@ -113,7 +128,7 @@ jobs:
       - notify
 
   merge_pull_request:
-    <<: *ruby_container
+    <<: *build_containers
     steps:
       - checkout
       - configure_build_tools
