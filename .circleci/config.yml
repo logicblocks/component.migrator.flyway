@@ -4,23 +4,23 @@ orbs:
   slack: circleci/slack@4.8.3
 
 ruby_container: &ruby_container
-  - image: ruby:3.1.1
+  image: ruby:3.1.1
 
 postgres_container: &postgres_container
-  - image: circleci/postgres:11.5-alpine
-    environment:
-      POSTGRES_DB: some-database
-      POSTGRES_PASSWORD: super-secret
-      POSTGRES_USER: admin
+  image: circleci/postgres:11.5-alpine
+  environment:
+    POSTGRES_DB: some-database
+    POSTGRES_PASSWORD: super-secret
+    POSTGRES_USER: admin
 
 build_containers: &build_containers
   docker:
-    <<: *ruby_container
+    - <<: *ruby_container
 
 test_containers: &test_containers
   docker:
-    <<: *ruby_container
-    <<: *postgres_container
+    - <<: *ruby_container
+    - <<: *postgres_container
 
 slack_context: &slack_context
   context:
