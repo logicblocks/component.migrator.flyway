@@ -1,25 +1,24 @@
-(ns component.flyway-migrator.core-test
+(ns component.migrator.flyway.core-test
   (:require
    [clojure.test :refer :all]
    [clojure.java.jdbc :as jdbc]
-
    [com.stuartsierra.component :as component]
-
-   [component.flyway-migrator.core :as flyway-migrator])
-  (:import [com.impossibl.postgres.jdbc PGDataSource]))
+   [component.migrator.flyway.core :as flyway-migrator])
+  (:import
+   [org.postgresql.ds PGSimpleDataSource]))
 
 (defn data-source [& {:as overrides}]
   (let [{:keys [host port user password database-name]}
         (merge
           {:host          "localhost"
-           :port          5432
+           :port          5434
            :user          "admin"
            :password      "super-secret"
            :database-name "some-database"}
           overrides)]
-    (doto (PGDataSource.)
-      (.setHost host)
-      (.setPort port)
+    (doto (PGSimpleDataSource.)
+      (.setServerNames (into-array String [host]))
+      (.setPortNumbers (int-array [port]))
       (.setUser user)
       (.setPassword password)
       (.setDatabaseName database-name))))
@@ -47,75 +46,65 @@
         (swap! container component/stop)))))
 
 (deftest runs-migrations-by-default-on-start
-  (let [data-source (data-source)
+  (let [data-source {:datasource (data-source)}
         configuration {}
-        db-spec {:datasource data-source}
         schema "public"]
-    (clear-schema db-spec schema)
+    (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component {:data-source data-source
-                                  :configuration  configuration})
+      (flyway-migrator/component configuration data-source)
       (fn [_]
-        (let [tables (list-tables-in-schema db-spec schema)]
+        (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"users" "flyway_schema_history"})))))))
 
 (deftest does-not-run-migrations-when-requested
-  (let [data-source (data-source)
+  (let [data-source {:datasource (data-source)}
         configuration {:migrate-on-start false}
-        db-spec {:datasource data-source}
         schema "public"]
-    (clear-schema db-spec schema)
+    (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component {:data-source data-source
-                                  :configuration  configuration})
+      (flyway-migrator/component configuration data-source)
       (fn [_]
-        (let [tables (list-tables-in-schema db-spec schema)]
+        (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 0)))))))
 
 (deftest allows-migrations-to-be-run-on-demand
-  (let [data-source (data-source)
+  (let [data-source {:datasource (data-source)}
         configuration {:migrate-on-start false}
-        db-spec {:datasource data-source}
         schema "public"]
-    (clear-schema db-spec schema)
+    (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component {:data-source data-source
-                                  :configuration  configuration})
+      (flyway-migrator/component configuration data-source)
       (fn [component]
         (flyway-migrator/migrate component)
-        (let [tables (list-tables-in-schema db-spec schema)]
+        (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"users" "flyway_schema_history"})))))))
 
 (deftest uses-the-provided-migration-locations
-  (let [data-source (data-source)
+  (let [data-source {:datasource (data-source)}
         configuration {:locations ["classpath:database/migrations"]}
-        db-spec {:datasource data-source}
         schema "public"]
-    (clear-schema db-spec schema)
+    (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component {:data-source data-source
-                                  :configuration  configuration})
+      (flyway-migrator/component configuration data-source)
       (fn [_]
-        (let [tables (list-tables-in-schema db-spec schema)]
+        (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"events" "flyway_schema_history"})))))))
 
 (deftest uses-the-provided-migration-table
-  (let [data-source (data-source)
+  (let [data-source {:datasource (data-source)}
         configuration {:table "migration_history"}
-        db-spec {:datasource data-source}
         schema "public"]
-    (clear-schema db-spec schema)
+    (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component {:data-source data-source
-                                  :configuration  configuration})
+      (flyway-migrator/component configuration data-source)
       (fn [_]
-        (let [tables (list-tables-in-schema db-spec schema)]
+        (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"users" "migration_history"})))))))

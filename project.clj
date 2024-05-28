@@ -1,39 +1,53 @@
-(defproject io.logicblocks/component.flyway-migrator "0.1.2-RC5"
+(defproject io.logicblocks/component.migrator.flyway "0.1.2-RC5"
   :description "A component to run flyway migrations on system start."
-  :url "https://github.com/logicblocks/component.flyway-migrator"
+  :url "https://github.com/logicblocks/component.migrator.flyway"
 
   :license {:name "The MIT License"
             :url  "https://opensource.org/licenses/MIT"}
 
-  :dependencies [[org.flywaydb/flyway-core "9.19.1"]
-                 [com.stuartsierra/component "1.1.0"]]
+  :plugins
+  [[lein-cloverage "1.2.4"]
+   [lein-shell "0.5.0"]
+   [lein-ancient "0.7.0"]
+   [lein-changelog "0.3.2"]
+   [lein-cprint "1.3.3"]
+   [lein-eftest "0.6.0"]
+   [lein-codox "0.10.8"]
+   [lein-cljfmt "0.9.2"]
+   [lein-kibit "0.1.8"]
+   [lein-bikeshed "0.5.2"]
+   [jonase/eastwood "1.4.0"]]
 
-  :plugins [[lein-cloverage "1.2.4"]
-            [lein-shell "0.5.0"]
-            [lein-cprint "1.3.3"]
-            [lein-ancient "0.7.0"]
-            [lein-changelog "0.3.2"]
-            [lein-eftest "0.6.0"]
-            [lein-codox "0.10.8"]
-            [lein-cljfmt "0.9.2"]
-            [lein-kibit "0.1.8"]
-            [lein-bikeshed "0.5.2"]
-            [jonase/eastwood "1.4.0"]]
+  :dependencies
+  [[io.logicblocks/cartus.core "0.1.18"]
+   [com.stuartsierra/component "1.1.0"]
+   [org.flywaydb/flyway-core "10.12.0"]]
 
   :profiles
   {:shared
    ^{:pom-scope :test}
-   {:dependencies [[org.clojure/clojure "1.11.1"]
-                   [org.clojure/java.jdbc "0.7.12"]
-                   [com.impossibl.pgjdbc-ng/pgjdbc-ng "0.8.9"]
-                   [nrepl "1.0.0"]
-                   [eftest "0.6.0"]]
+   {:dependencies
+    [[org.clojure/clojure "1.11.3"]
+     [org.clojure/java.jdbc "0.7.12"]
+     [org.postgresql/postgresql "42.6.0"]
+     [org.flywaydb/flyway-database-postgresql "10.12.0"]
+     [nrepl "1.1.0"]
+     [eftest "0.6.0"]]
+
     :resource-paths ["test_resources"]}
+
+   :dev-specific
+   {:source-paths ["dev"]
+    :eftest       {:multithread? false}}
+
+   :test-specific
+   {:eftest {:multithread? false}}
+
    :dev
-   [:shared {:source-paths ["dev"]
-             :eftest       {:multithread? false}}]
+   [:shared :dev-specific]
+
    :test
-   [:shared {:eftest {:multithread? false}}]
+   [:shared :test-specific]
 
    :prerelease
    {:release-tasks
@@ -67,13 +81,15 @@
   {:ns-exclude-regex [#"^user"]}
 
   :codox
-  {:namespaces  [#"^component\.flyway-migrator\."]
+  {:namespaces  [#"^component\.migrator\.flyway\."]
    :metadata    {:doc/format :markdown}
    :output-path "docs"
    :doc-paths   ["docs"]
-   :source-uri  "https://github.com/logicblocks/component.flyway-migrator/blob/{version}/{filepath}#L{line}"}
+   :source-uri  "https://github.com/logicblocks/component.migrator.flyway/blob/{version}/{filepath}#L{line}"}
 
-  :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
+  :cljfmt {:indents {#".*"     [[:inner 0]]
+                     defrecord [[:block 1] [:inner 1]]
+                     deftype   [[:block 1] [:inner 1]]}}
 
   :eastwood {:config-files ["config/linter.clj"]}
 

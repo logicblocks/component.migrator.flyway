@@ -1,8 +1,8 @@
-(ns component.flyway-migrator.flyway
+(ns component.migrator.flyway.api
   (:import
    [org.flywaydb.core Flyway]))
 
-(defn client [{:keys [data-source locations table]}]
+(defn instance [{:keys [data-source locations table]}]
   (let [configuration (Flyway/configure)
         configuration (.dataSource configuration data-source)
         configuration (if-not (nil? locations)

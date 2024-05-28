@@ -12,6 +12,7 @@ postgres_container: &postgres_container
     POSTGRES_DB: some-database
     POSTGRES_PASSWORD: super-secret
     POSTGRES_USER: admin
+    PGPORT: 5434
 
 build_containers: &build_containers
   docker:
