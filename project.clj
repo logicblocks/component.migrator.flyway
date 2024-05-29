@@ -20,6 +20,7 @@
 
   :dependencies
   [[io.logicblocks/cartus.core "0.1.18"]
+   [io.logicblocks/pathological "0.1.22-RC2"]
    [com.stuartsierra/component "1.1.0"]
    [org.flywaydb/flyway-core "10.12.0"]]
 
