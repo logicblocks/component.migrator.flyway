@@ -31,7 +31,7 @@
                  paths
                  (map
                    (fn [^Location location]
-                     ^Path (pp/->path fs (.getPath location)))
+                     (pp/path fs (.getPath location)))
                    locations)]
              (reduce
                (fn [acc path]
