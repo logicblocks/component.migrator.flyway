@@ -27,7 +27,7 @@
            (let [class-loader (.getClassLoader (.getClass provider))
                  suffixes (vec suffixes)
                  fs
-                 (FileSystems/newFileSystem (URI/create "resource:/") (Map/of))
+                 (FileSystems/getFileSystem (URI/create "resource:/"))
                  paths
                  (map
                    (fn [^Location location]
