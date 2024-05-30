@@ -24,38 +24,39 @@
                  nil name class-loader StandardCharsets/UTF_8))))
 
          (getResources [provider prefix suffixes]
-           (let [class-loader (.getClassLoader (.getClass provider))
-                 suffixes (vec suffixes)
-                 fs
-                 (FileSystems/getFileSystem (URI/create "resource:/"))
-                 paths
-                 (map
-                   (fn [^Location location]
-                     (pp/path fs (.getPath location)))
-                   locations)]
-             (reduce
-               (fn [acc path]
-                 (into acc
-                   (pf/walk-file-tree path
-                     :initial-value []
-                     :visit-file-fn
-                     (fn [files file attributes]
-                       (let [file-name-string (str (pp/file-name file))]
-                         {:control :continue
-                          :result
-                          (if (and (:regular-file? attributes)
-                                (str/starts-with? file-name-string prefix)
-                                (some
-                                  (fn [suffix]
-                                    (str/ends-with? file-name-string suffix))
-                                  suffixes))
-                            (conj files
-                              (ClassPathResource.
-                                nil (str file) class-loader
-                                StandardCharsets/UTF_8))
-                            files)})))))
-               []
-               paths))))
+           (with-open [fs (FileSystems/newFileSystem
+                            (URI/create "resource:/")
+                            (Map/of))]
+             (let [class-loader (.getClassLoader (.getClass provider))
+                   suffixes (vec suffixes)
+                   paths
+                   (map
+                     (fn [^Location location]
+                       (pp/path fs (.getPath location)))
+                     locations)]
+               (reduce
+                 (fn [acc path]
+                   (into acc
+                     (pf/walk-file-tree path
+                       :initial-value []
+                       :visit-file-fn
+                       (fn [files file attributes]
+                         (let [file-name-string (str (pp/file-name file))]
+                           {:control :continue
+                            :result
+                            (if (and (:regular-file? attributes)
+                                  (str/starts-with? file-name-string prefix)
+                                  (some
+                                    (fn [suffix]
+                                      (str/ends-with? file-name-string suffix))
+                                    suffixes))
+                              (conj files
+                                (ClassPathResource.
+                                  nil (str file) class-loader
+                                  StandardCharsets/UTF_8))
+                              files)})))))
+                 []
+                 paths)))))
 
 (defn instance [{:keys [data-source locations table]}]
   (let [configuration (Flyway/configure)
