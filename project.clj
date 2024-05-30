@@ -1,4 +1,4 @@
-(defproject io.logicblocks/component.migrator.flyway "0.1.2-RC9"
+(defproject io.logicblocks/component.migrator.flyway "0.1.2-RC10"
   :description "A component to run flyway migrations on system start."
   :url "https://github.com/logicblocks/component.migrator.flyway"
 
