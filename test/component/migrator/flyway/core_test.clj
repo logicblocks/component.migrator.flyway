@@ -3,7 +3,10 @@
    [clojure.test :refer :all]
    [clojure.java.jdbc :as jdbc]
    [com.stuartsierra.component :as component]
-   [component.migrator.flyway.core :as flyway-migrator])
+   [component.migrator.flyway.core :as flyway-migrator]
+   [component.migrator.flyway.configuration :as configuration]
+   [configurati.component :as conf-comp]
+   [configurati.core :as conf])
   (:import
    [org.postgresql.ds PGSimpleDataSource]))
 
@@ -51,7 +54,9 @@
         schema "public"]
     (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component configuration data-source)
+      (flyway-migrator/component
+        {:configuration configuration
+         :data-source   data-source})
       (fn [_]
         (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
@@ -64,7 +69,9 @@
         schema "public"]
     (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component configuration data-source)
+      (flyway-migrator/component
+        {:configuration configuration
+         :data-source   data-source})
       (fn [_]
         (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 0)))))))
@@ -75,7 +82,9 @@
         schema "public"]
     (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component configuration data-source)
+      (flyway-migrator/component
+        {:configuration configuration
+         :data-source   data-source})
       (fn [component]
         (flyway-migrator/migrate component)
         (let [tables (list-tables-in-schema data-source schema)]
@@ -89,7 +98,9 @@
         schema "public"]
     (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component configuration data-source)
+      (flyway-migrator/component
+        {:configuration configuration
+         :data-source   data-source})
       (fn [_]
         (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
@@ -102,9 +113,60 @@
         schema "public"]
     (clear-schema data-source schema)
     (with-started-component
-      (flyway-migrator/component configuration data-source)
+      (flyway-migrator/component
+        {:configuration configuration
+         :data-source   data-source})
       (fn [_]
         (let [tables (list-tables-in-schema data-source schema)]
           (is (= (count tables) 2))
           (is (= (set (map :tablename tables))
                 #{"users" "migration_history"})))))))
+
+(deftest configures-component-using-default-specification
+  (let [data-source {:datasource (data-source)}
+        configuration
+        {:locations        ["classpath:db/migrations"]
+         :table            "migrations"
+         :migrate-on-start false}
+        component (flyway-migrator/component
+                    {:data-source data-source})
+        component (conf-comp/configure component
+                    {:configuration-source
+                     (conf/map-source configuration)})]
+    (is (= configuration (:configuration component)))))
+
+(deftest allows-specification-to-be-overridden
+  (let [configuration
+        {:table            "migrations"
+         :migrate-on-start false}
+        specification
+        (conf/configuration-specification
+          (conf/with-parameter :locations :default ["filesystem:db/migrations"])
+          (conf/with-parameter configuration/table-parameter)
+          (conf/with-parameter configuration/migrate-on-start-parameter))
+        component (flyway-migrator/component
+                    {:configuration-specification specification})
+        component (conf-comp/configure component
+                    {:configuration-source (conf/map-source configuration)})]
+    (is (= {:locations        ["filesystem:db/migrations"]
+            :table            "migrations"
+            :migrate-on-start false}
+          (:configuration component)))))
+
+(deftest allows-default-source-to-be-provided
+  (let [default-source
+        (conf/map-source
+          {:locations ["filesystem:db/migrations"]
+           :table     "migrations"})
+        configure-time-source
+        (conf/map-source
+          {:locations ["classpath:db/migrations"]
+           :migrate-on-start false})
+        component (flyway-migrator/component
+                    {:configuration-source default-source})
+        component (conf-comp/configure component
+                    {:configuration-source configure-time-source})]
+    (is (= {:locations        ["classpath:db/migrations"]
+            :table            "migrations"
+            :migrate-on-start false}
+          (:configuration component)))))

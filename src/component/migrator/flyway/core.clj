@@ -6,10 +6,17 @@
 (defn component
   ([]
    (component/map->FlywayMigrator {}))
-  ([configuration data-source]
+  ([{:keys [configuration-specification
+            configuration-source
+            configuration
+            data-source
+            logger]}]
    (component/map->FlywayMigrator
-     {:configuration configuration
-      :data-source   data-source})))
+     {:configuration-specification configuration-specification
+      :configuration-source        configuration-source
+      :configuration               configuration
+      :data-source                 data-source
+      :logger                      logger})))
 
 (defn migrate [component]
   (api/migrate (:instance component)))

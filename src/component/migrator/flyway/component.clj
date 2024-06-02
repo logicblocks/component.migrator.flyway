@@ -1,11 +1,35 @@
 (ns component.migrator.flyway.component
   (:require
    [com.stuartsierra.component :as component]
-   [component.migrator.flyway.api :as flyway-api]
-   [component.support.logging :as comp-log]))
+   [component.migrator.flyway.api :as api]
+   [component.migrator.flyway.configuration :as configuration]
+   [component.support.logging :as comp-log]
+   [configurati.component :as conf-comp]
+   [configurati.core :as conf]))
 
 (defrecord FlywayMigrator
-  [configuration data-source logger instance]
+  [configuration-specification
+   configuration-source
+   configuration
+   data-source
+   logger
+   instance]
+
+  conf-comp/Configurable
+  (configure [component opts]
+    (comp-log/with-logging logger :component.migrator.flyway
+      {:phases  {:before :configuring :after :configured}}
+      (assoc component
+        :configuration
+        (conf/resolve
+          (conf/configuration
+            (conf/with-specification
+              (or configuration-specification configuration/specification))
+            (conf/with-source
+              (apply conf/multi-source
+                (remove nil?
+                  [(:configuration-source opts)
+                   configuration-source]))))))))
 
   component/Lifecycle
   (start [component]
@@ -13,14 +37,14 @@
       {:phases  {:before :starting :after :started}
        :context {:configuration configuration}}
       (let [instance
-            (flyway-api/instance
+            (api/instance
               (merge
                 {:data-source (:datasource data-source)}
                 configuration))
             migrate-on-start
             (get configuration :migrate-on-start true)]
         (when migrate-on-start
-          (flyway-api/migrate instance))
+          (api/migrate instance))
         (assoc component :instance instance))))
 
   (stop [component]
