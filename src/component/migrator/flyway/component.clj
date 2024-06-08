@@ -10,6 +10,7 @@
 (defrecord FlywayMigrator
   [configuration-specification
    configuration-source
+   configuration-lookup-prefix
    configuration
    data-source
    logger
@@ -19,17 +20,17 @@
   (configure [component opts]
     (comp-log/with-logging logger :component.migrator.flyway
       {:phases  {:before :configuring :after :configured}}
-      (assoc component
-        :configuration
-        (conf/resolve
-          (conf/configuration
-            (conf/with-specification
-              (or configuration-specification configuration/specification))
-            (conf/with-source
-              (apply conf/multi-source
-                (remove nil?
-                  [(:configuration-source opts)
-                   configuration-source]))))))))
+      (let [source
+            (conf/multi-source
+              (:configuration-source opts)
+              configuration-source)
+            configuration
+            (conf/configuration
+              (conf/with-lookup-prefix configuration-lookup-prefix)
+              (conf/with-specification
+                (or configuration-specification configuration/specification))
+              (conf/with-source source))]
+        (assoc component :configuration (conf/resolve configuration)))))
 
   component/Lifecycle
   (start [component]

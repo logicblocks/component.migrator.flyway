@@ -160,12 +160,29 @@
            :table     "migrations"})
         configure-time-source
         (conf/map-source
-          {:locations ["classpath:db/migrations"]
+          {:locations        ["classpath:db/migrations"]
            :migrate-on-start false})
         component (flyway-migrator/component
                     {:configuration-source default-source})
         component (conf-comp/configure component
                     {:configuration-source configure-time-source})]
+    (is (= {:locations        ["classpath:db/migrations"]
+            :table            "migrations"
+            :migrate-on-start false}
+          (:configuration component)))))
+
+(deftest allows-configuration-lookup-key-to-be-provided
+  (let [data-source {:datasource (data-source)}
+        configuration-source
+        (conf/map-source
+          {:migrator-locations        ["classpath:db/migrations"]
+           :migrator-table            "migrations"
+           :migrator-migrate-on-start false})
+        component (flyway-migrator/component
+                    {:data-source data-source
+                     :configuration-lookup-prefix :migrator})
+        component (conf-comp/configure component
+                    {:configuration-source configuration-source})]
     (is (= {:locations        ["classpath:db/migrations"]
             :table            "migrations"
             :migrate-on-start false}
