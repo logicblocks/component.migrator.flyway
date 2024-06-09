@@ -35,7 +35,6 @@
     [[org.clojure/clojure "1.11.3"]
      [org.clojure/java.jdbc "0.7.12"]
      [org.postgresql/postgresql "42.7.3"]
-     [org.flywaydb/flyway-database-postgresql "10.14.0"]
      [nrepl "1.1.2"]
      [eftest "0.6.0"]]
 
