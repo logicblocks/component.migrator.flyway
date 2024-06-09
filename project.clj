@@ -19,12 +19,14 @@
    [jonase/eastwood "1.4.0"]]
 
   :dependencies
-  [[io.logicblocks/cartus.core "0.1.18"]
+  [[io.logicblocks/cartus.core "0.1.19-RC7"]
    [io.logicblocks/component.support "0.1.0-RC2"]
    [io.logicblocks/configurati "0.5.7-RC16"]
    [io.logicblocks/pathological "0.1.22-RC2"]
    [com.stuartsierra/component "1.1.0"]
-   [org.flywaydb/flyway-core "10.12.0"]]
+   [org.flywaydb/flyway-core "10.14.0"]
+   ;; TODO: move postgresql dependency and metadata to separate module.
+   [org.flywaydb/flyway-database-postgresql "10.14.0"]]
 
   :profiles
   {:shared
@@ -32,9 +34,9 @@
    {:dependencies
     [[org.clojure/clojure "1.11.3"]
      [org.clojure/java.jdbc "0.7.12"]
-     [org.postgresql/postgresql "42.6.0"]
-     [org.flywaydb/flyway-database-postgresql "10.12.0"]
-     [nrepl "1.1.0"]
+     [org.postgresql/postgresql "42.7.3"]
+     [org.flywaydb/flyway-database-postgresql "10.14.0"]
+     [nrepl "1.1.2"]
      [eftest "0.6.0"]]
 
     :resource-paths ["test_resources"]}
