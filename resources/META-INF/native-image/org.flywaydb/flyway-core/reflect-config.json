@@ -15,6 +15,14 @@
     "allPublicMethods": true
   },
   {
+    "name": "org.flywaydb.core.internal.publishing.PublishingConfigurationExtension",
+    "condition": {
+      "typeReachable": "org.flywaydb.core.internal.plugin.PluginRegister"
+    },
+    "allPublicConstructors": true,
+    "allPublicMethods": true
+  },
+  {
     "name": "org.flywaydb.core.extensibility.Plugin",
     "condition": {
       "typeReachable": "org.flywaydb.core.internal.plugin.PluginRegister"
